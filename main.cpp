@@ -9,7 +9,7 @@ Q_DECLARE_METATYPE( struct timespec );
 
 int main(int argc, char *argv[])
 {
-	QCoreApplication a(argc, argv);
+	QCoreApplication app(argc, argv);
 	qRegisterMetaType< struct timespec >();
 
 
@@ -48,7 +48,7 @@ if( Tuning::DoCpuAffinity ) {
 
 	setScheduler( Tuning::DoFIFOScheduler, false );
 
-	MainThread mt;
+	MainThread *mt = new MainThread( &app );
 
-	return a.exec();
+	return app.exec();
 }

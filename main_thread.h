@@ -24,22 +24,26 @@ public:
 			QCoreApplication::quit();
 		}
 
-		_crit.moveToThread( &_critThread );
-		QObject::connect( &_critThread, SIGNAL(started()), &_crit, SLOT(initInThread()));
-		QObject::connect( &_critThread, SIGNAL(finished()), &_crit, SLOT(deleteLater()));
+		_crit = new CriticalTask( );
+		_critThread = new QThread( this );
+		_crit->moveToThread( _critThread );
+		QObject::connect( _critThread, SIGNAL(started()), _crit, SLOT(initInThread()));
+		QObject::connect( _critThread, SIGNAL(finished()), _crit, SLOT(deleteLater()));
 
-		QObject::connect( &_crit, SIGNAL(timestamp(const struct timespec &)),
+		QObject::connect( _crit, SIGNAL(timestamp(const struct timespec &)),
 											this, SLOT(logTimestamp(const struct timespec &)), Qt::QueuedConnection );
 
 		for( unsigned int i = 0; i < NumNonCriticalThreads; ++i ) {
-			_noncrit[i].moveToThread( &_noncritThreads[i] );
-			QObject::connect( &_noncritThreads[i], SIGNAL(started()), &_noncrit[i], SLOT(initInThread()));
-			QObject::connect( &_noncritThreads[i], SIGNAL(finished()), &_noncrit[i], SLOT(deleteLater()));
+			_noncrit[i] = new NonCriticalTask( );
+			_noncritThreads[i] = new QThread( this );
+			_noncrit[i]->moveToThread( _noncritThreads[i] );
+			QObject::connect( _noncritThreads[i], SIGNAL(started()), _noncrit[i], SLOT(initInThread()));
+			QObject::connect( _noncritThreads[i], SIGNAL(finished()), _noncrit[i], SLOT(deleteLater()));
 
-			_noncritThreads[i].start();
+			_noncritThreads[i]->start();
 		}
 
-		_critThread.start();
+		_critThread->start();
 
 		startTimer( RunFor, NonCriticalTimerType );
 
@@ -48,12 +52,17 @@ public:
 
 	~MainThread()
 	{
-		_critThread.quit();
-		_critThread.wait();
+		_critThread->quit();
+		_critThread->wait();
 
 		for( auto &thread : _noncritThreads ) {
-			thread.quit();
-			thread.wait();
+			thread->quit();
+			thread->wait();
+		}
+
+		delete _crit;
+		for( auto &task : _noncrit ) {
+			delete task;
 		}
 
 		_logFile.close();
@@ -85,13 +94,14 @@ protected:
 
 	QFile _logFile;
 	QTextStream _logStream;
-
-	CriticalTask _crit;
-	std::array< NonCriticalTask, NumNonCriticalThreads > _noncrit;
-
-	QThread _critThread;
-	std::array< QThread, NumNonCriticalThreads > _noncritThreads;
-
 	unsigned int _logCount;
+
+	CriticalTask *_crit;
+	std::array< NonCriticalTask *, NumNonCriticalThreads > _noncrit;
+
+	QThread *_critThread;
+	std::array< QThread *, NumNonCriticalThreads > _noncritThreads;
+
+
 
 };

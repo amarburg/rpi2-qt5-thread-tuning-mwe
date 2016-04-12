@@ -14,6 +14,9 @@ public:
 	CriticalTask()
 	{;}
 
+	~CriticalTask()
+	{;}
+
 public slots:
 	void initInThread( void )
 	{

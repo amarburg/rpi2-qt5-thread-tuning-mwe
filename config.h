@@ -9,7 +9,7 @@ const static unsigned int NumNonCriticalThreads = 8;
 const static unsigned int NonCriticalTaskPeriod = 100;  // ms
 const static Qt::TimerType NonCriticalTimerType = Qt::CoarseTimer;
 
-const static unsigned int RunFor = 1000; // ms
+const static unsigned int RunFor = 10000; // ms
 
 namespace Tuning {
 
