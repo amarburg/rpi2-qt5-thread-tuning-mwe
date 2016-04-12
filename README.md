@@ -35,4 +35,4 @@ it's only really the soft limit which matters.  It must be non-zero to allow cha
 
 I've written a very short [Jupyter](http://jupyter.org/) / iPython [notebook](https://github.com/amarburg/rpi2-qt5-thread-tuning-mwe/blob/master/timestamp_analysis.ipynb) which does some basic analysis on the data.  It produces some nice plots:
 
-[[https://raw.githubusercontent.com/amarburg/rpi2-qt5-thread-tuning-mwe/master/histogram.png|alt=histograms]]
+![histograms](https://raw.githubusercontent.com/amarburg/rpi2-qt5-thread-tuning-mwe/master/histogram.png)
