@@ -13,5 +13,26 @@ We were developing on a Raspberry Pi 2, so that's my focus.  No reason this woul
 ## Install
 
 	sudo apt-get install qt5-default g++
-	qmake pi2-qt5-thread-tuning-mwe.pro
+	qmake rpi2-qt5-thread-tuning-mwe.pro
 	make -j4
+	./rpi2-qt5-thread-tuning-mwe
+
+Individual tuning options can be turned on and off in ``config.h``
+
+#### Setting RT_FIFO priorities
+
+In newer OS (in my case, Raspbian 2016-03-18 Jessie Lite) normal users do not have privileges to change their scheduler and priority.   To give a user those permissions, put a file in ``/etc/security/limits.d``:
+
+	pi	soft	rtprio 2
+
+This allows the user ``pi`` to change to the RT_FIFO scheduler and to set scheduler priorities up to 2 (which is one more than the minimum).    Based on my reading of the [man page](http://linux.die.net/man/2/sched_setscheduler):
+
+	If the RLIMIT_RTPRIO soft limit is 0, then the only permitted changes are to lower the priority, or to switch to a non-real-time policy.
+
+it's only really the soft limit which matters.  It must be non-zero to allow changes to the priority, and it sets the maximum priority allowed to the user.
+
+## Analysis
+
+I've written a very short [Jupyter](http://jupyter.org/) / iPython [notebook](https://github.com/amarburg/rpi2-qt5-thread-tuning-mwe/blob/master/timestamp_analysis.ipynb) which does some basic analysis on the data.  It produces some nice plots:
+
+[[https://raw.githubusercontent.com/amarburg/rpi2-qt5-thread-tuning-mwe/master/histogram.png|alt=histograms]]
